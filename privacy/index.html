@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stash / Privacy</title>
+<meta name="description" content="What Stash does with your data. Everything you save stays on your device. No accounts, no ads, no tracking.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --canvas: #EEEDE8;
+    --card: #FFFFFF;
+    --soft: #F4F3EE;
+    --ink: #131313;
+    --body-secondary: #5C5A53;
+    --micro: #7C7A73;
+    --meta: #9A988F;
+    --faint: #B4B2AC;
+    --border-card: #E4E1D9;
+    --divider: #E2E1DC;
+    --accent: #FF6766;
+    --crimson: #CA2851;
+    --sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 18px 18px 56px;
+  }
+
+  /* Header: the app's wordmark row, then its micro sub-header row. */
+  .wordmark {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    line-height: 1;
+    margin: 0;
+  }
+
+  .wordmark a { color: var(--ink); text-decoration: none; }
+  .wordmark a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .wordmark .slash { color: var(--faint); }
+
+  .subhead {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 15px 0 0;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--micro);
+  }
+
+  h1 {
+    font-weight: 600;
+    font-size: clamp(30px, 8vw, 40px);
+    letter-spacing: -0.5px;
+    line-height: 1.15;
+    margin: 28px 0 0;
+  }
+
+  .rule {
+    height: 3px;
+    width: 64px;
+    margin: 20px 0 18px;
+    border-radius: 2px;
+    background: linear-gradient(105deg, var(--crimson) 0%, var(--accent) 100%);
+  }
+
+  .lead {
+    margin: 0 0 8px;
+    font-size: 17px;
+    color: var(--body-secondary);
+  }
+
+  section { margin-top: 34px; }
+
+  .eyebrow {
+    margin: 0 0 7px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--micro);
+  }
+
+  .eyebrow .num { color: var(--accent); }
+
+  h2 {
+    font-weight: 600;
+    font-size: 20px;
+    letter-spacing: -0.3px;
+    line-height: 1.3;
+    margin: 0 0 10px;
+  }
+
+  p { margin: 0 0 12px; }
+
+  p:last-child { margin-bottom: 0; }
+
+  .secondary { color: var(--body-secondary); }
+
+  /* Data lives in the mono, on a white card, the way a saved link does in the app. */
+  .card {
+    background: var(--card);
+    border: 1.5px solid var(--border-card);
+    border-radius: 18px;
+    padding: 16px;
+    margin: 16px 0;
+  }
+
+  .card-head {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--micro);
+    margin: 0 0 12px;
+  }
+
+  ul.events {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  ul.events li {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 7px 0;
+    border-top: 1px solid var(--divider);
+  }
+
+  ul.events li:first-child { border-top: 0; padding-top: 0; }
+
+  ul.events li:last-child { padding-bottom: 0; }
+
+  /* The collection marker from the app: a sharp square, never rounded. */
+  ul.events .marker {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  ul.events .qualifier { color: var(--meta); }
+
+  .never {
+    background: var(--soft);
+    border: 1.5px solid var(--border-card);
+    border-radius: 18px;
+    padding: 16px;
+    margin: 16px 0 0;
+  }
+
+  .never p { font-size: 15px; }
+
+  a.inline {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 1.5px;
+  }
+
+  a.inline:hover { color: var(--crimson); }
+
+  hr.div {
+    border: 0;
+    border-top: 1px solid var(--divider);
+    margin: 40px 0 0;
+  }
+
+  footer {
+    margin-top: 22px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--meta);
+  }
+
+  footer nav { margin-bottom: 8px; }
+
+  footer a {
+    color: var(--meta);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  footer a:hover { color: var(--ink); }
+
+  footer .sep { color: var(--faint); padding: 0 6px; }
+
+  @media (min-width: 700px) {
+    .wrap { padding: 28px 28px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="wordmark"><a href="../">STASH</a> <span class="slash">/ PRIVACY</span></p>
+      <p class="subhead">
+        <span>Privacy policy</span>
+        <span>Updated 5 Aug 2026</span>
+      </p>
+    </header>
+
+    <main>
+      <h1>Privacy</h1>
+      <div class="rule"></div>
+      <p class="lead">Stash is a link saver that runs on your iPhone. This page is the whole story of what it does with your data. It is short because there is not much to tell.</p>
+
+      <section>
+        <p class="eyebrow"><span class="num">01</span> / On your device</p>
+        <h2>Everything you save stays on your device</h2>
+        <p class="secondary">The links you save, their titles, your notes, your tags and your collections are stored by Stash on your iPhone. They are not uploaded to a server, and I never see them.</p>
+      </section>
+
+      <section>
+        <p class="eyebrow"><span class="num">02</span> / Accounts</p>
+        <h2>No accounts</h2>
+        <p class="secondary">There is no sign-up and no login. Stash never asks for your name, your email address or a password.</p>
+      </section>
+
+      <section>
+        <p class="eyebrow"><span class="num">03</span> / Ads</p>
+        <h2>No ads</h2>
+        <p class="secondary">There are no ads in Stash.</p>
+      </section>
+
+      <section>
+        <p class="eyebrow"><span class="num">04</span> / Tracking</p>
+        <h2>No tracking</h2>
+        <p class="secondary">Stash does not track you. It does not follow you across other apps or websites, and it does not use the advertising identifier.</p>
+      </section>
+
+      <section>
+        <p class="eyebrow"><span class="num">05</span> / Analytics</p>
+        <h2>Anonymized usage analytics</h2>
+        <p class="secondary">Stash sends a small set of anonymized usage events through <a class="inline" href="https://telemetrydeck.com" rel="noopener">TelemetryDeck</a>, so I can see which parts of the app get used. This is the complete list of what is sent.</p>
+
+        <div class="card">
+          <p class="card-head">Every event Stash sends</p>
+          <ul class="events">
+            <li><span class="marker" aria-hidden="true"></span><span>app launched</span></li>
+            <li><span class="marker" aria-hidden="true"></span><span>link saved <span class="qualifier">(and whether it came from the app or the share extension)</span></span></li>
+            <li><span class="marker" aria-hidden="true"></span><span>search used</span></li>
+            <li><span class="marker" aria-hidden="true"></span><span>export used</span></li>
+            <li><span class="marker" aria-hidden="true"></span><span>tag toggled</span></li>
+            <li><span class="marker" aria-hidden="true"></span><span>link filed</span></li>
+          </ul>
+        </div>
+
+        <div class="never">
+          <p class="card-head">What is never sent</p>
+          <p class="secondary">The content of what you save. An event records that something happened, never a URL, a title, a note, or the name of a tag or a collection. The events are not linked to you or to any account.</p>
+        </div>
+      </section>
+
+      <section>
+        <p class="eyebrow"><span class="num">06</span> / Contact</p>
+        <h2>Questions</h2>
+        <p class="secondary">If something here does not match what you see in the app, tell me: <a class="inline" href="mailto:jonathan.nyst@gmail.com">jonathan.nyst@gmail.com</a>.</p>
+      </section>
+    </main>
+
+    <hr class="div">
+    <footer>
+      <nav>
+        <a href="../support/">Support</a><span class="sep">/</span><a href="../">Stash</a><span class="sep">/</span><a href="mailto:jonathan.nyst@gmail.com">Email</a>
+      </nav>
+      <p>Stash is made by Jonathan Nyst.</p>
+    </footer>
+  </div>
+</body>
+</html>

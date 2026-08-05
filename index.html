@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stash</title>
+<meta name="description" content="Stash is a link saver for iPhone. Everything you save stays on your device.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --canvas: #EEEDE8;
+    --card: #FFFFFF;
+    --ink: #131313;
+    --body-secondary: #5C5A53;
+    --micro: #7C7A73;
+    --meta: #9A988F;
+    --faint: #B4B2AC;
+    --border-card: #E4E1D9;
+    --divider: #E2E1DC;
+    --accent: #FF6766;
+    --crimson: #CA2851;
+    --sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 18px 18px 56px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .hero { margin-top: 18vh; }
+
+  h1 {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: clamp(38px, 13vw, 62px);
+    letter-spacing: 4px;
+    line-height: 1;
+    margin: 0;
+  }
+
+  .rule {
+    height: 3px;
+    width: 64px;
+    margin: 22px 0 0;
+    border-radius: 2px;
+    background: linear-gradient(105deg, var(--crimson) 0%, var(--accent) 100%);
+  }
+
+  /* The app's sub-header row: two micro labels, one at each edge. */
+  .subhead {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 18px 0 0;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--micro);
+  }
+
+  .lead {
+    margin: 14px 0 34px;
+    font-size: 17px;
+    max-width: 46ch;
+    color: var(--body-secondary);
+  }
+
+  .lead strong { color: var(--ink); font-weight: 500; }
+
+  .links { display: flex; flex-direction: column; gap: 12px; }
+
+  a.card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    background: var(--card);
+    border: 1.5px solid var(--border-card);
+    border-radius: 18px;
+    padding: 15px 16px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s ease;
+  }
+
+  a.card:hover, a.card:focus-visible { border-color: var(--ink); }
+
+  a.card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .card-label {
+    display: block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--micro);
+    margin-bottom: 3px;
+  }
+
+  .card-title {
+    display: block;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: -0.2px;
+  }
+
+  .card-arrow { font-family: var(--mono); color: var(--faint); font-size: 15px; }
+
+  footer {
+    margin-top: auto;
+    padding-top: 40px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--meta);
+  }
+
+  footer a { color: var(--meta); text-decoration: underline; text-underline-offset: 3px; }
+  footer a:hover { color: var(--ink); }
+
+  @media (min-width: 700px) {
+    .wrap { padding: 28px 28px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="hero">
+      <h1>STASH</h1>
+      <div class="rule"></div>
+      <p class="subhead">
+        <span>Link saver for iPhone</span>
+        <span>v 1.0</span>
+      </p>
+      <p class="lead">Send it a link from any app. It keeps the link and its title, on <strong>your device only</strong>. No accounts, no ads.</p>
+
+      <nav class="links">
+        <a class="card" href="support/">
+          <span>
+            <span class="card-label">Getting started</span>
+            <span class="card-title">Support</span>
+          </span>
+          <span class="card-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+        <a class="card" href="privacy/">
+          <span>
+            <span class="card-label">What is collected</span>
+            <span class="card-title">Privacy</span>
+          </span>
+          <span class="card-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </nav>
+    </div>
+
+    <footer>
+      <a href="mailto:jonathan.nyst@gmail.com">jonathan.nyst@gmail.com</a>
+    </footer>
+  </div>
+</body>
+</html>

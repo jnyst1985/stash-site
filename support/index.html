@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stash / Support</title>
+<meta name="description" content="What Stash is, how to save a link from any app with the share sheet, and how to get help.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --canvas: #EEEDE8;
+    --card: #FFFFFF;
+    --soft: #F4F3EE;
+    --ink: #131313;
+    --body-secondary: #5C5A53;
+    --micro: #7C7A73;
+    --meta: #9A988F;
+    --faint: #B4B2AC;
+    --border-card: #E4E1D9;
+    --divider: #E2E1DC;
+    --accent: #FF6766;
+    --crimson: #CA2851;
+    --sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 18px 18px 56px;
+  }
+
+  .wordmark {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    line-height: 1;
+    margin: 0;
+  }
+
+  .wordmark a { color: var(--ink); text-decoration: none; }
+  .wordmark a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .wordmark .slash { color: var(--faint); }
+
+  .subhead {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 15px 0 0;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--micro);
+  }
+
+  h1 {
+    font-weight: 600;
+    font-size: clamp(30px, 8vw, 40px);
+    letter-spacing: -0.5px;
+    line-height: 1.15;
+    margin: 28px 0 0;
+  }
+
+  .rule {
+    height: 3px;
+    width: 64px;
+    margin: 20px 0 18px;
+    border-radius: 2px;
+    background: linear-gradient(105deg, var(--crimson) 0%, var(--accent) 100%);
+  }
+
+  .lead { margin: 0; font-size: 17px; color: var(--body-secondary); }
+
+  .lead strong { color: var(--ink); font-weight: 500; }
+
+  section { margin-top: 36px; }
+
+  .eyebrow {
+    margin: 0 0 7px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--micro);
+  }
+
+  h2 {
+    font-weight: 600;
+    font-size: 20px;
+    letter-spacing: -0.3px;
+    line-height: 1.3;
+    margin: 0 0 12px;
+  }
+
+  p { margin: 0 0 12px; }
+
+  p:last-child { margin-bottom: 0; }
+
+  .secondary { color: var(--body-secondary); }
+
+  /* Three steps, one card, hairline between rows: the app's grouped-row pattern. */
+  ol.steps {
+    list-style: none;
+    counter-reset: step;
+    margin: 0;
+    padding: 0;
+    background: var(--card);
+    border: 1.5px solid var(--border-card);
+    border-radius: 18px;
+  }
+
+  ol.steps li {
+    counter-increment: step;
+    display: flex;
+    gap: 14px;
+    padding: 16px;
+    border-top: 1px solid var(--divider);
+  }
+
+  ol.steps li:first-child { border-top: 0; }
+
+  ol.steps li::before {
+    content: "0" counter(step);
+    flex: none;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 12.5px;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    padding-top: 2px;
+  }
+
+  .step-title {
+    display: block;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: -0.2px;
+    margin-bottom: 3px;
+  }
+
+  .step-body { display: block; font-size: 15px; color: var(--body-secondary); }
+
+  /* Machine values stay in the mono, the way the app sets them. */
+  .ui {
+    font-family: var(--mono);
+    font-size: 0.86em;
+    letter-spacing: 0.3px;
+    color: var(--ink);
+  }
+
+  dl.notes { margin: 0; }
+
+  dl.notes dt {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--micro);
+    margin-top: 18px;
+  }
+
+  dl.notes dt:first-child { margin-top: 0; }
+
+  dl.notes dd {
+    margin: 5px 0 0;
+    font-size: 15px;
+    color: var(--body-secondary);
+  }
+
+  a.inline {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 1.5px;
+    overflow-wrap: anywhere;
+  }
+
+  a.inline:hover { color: var(--crimson); }
+
+  hr.div {
+    border: 0;
+    border-top: 1px solid var(--divider);
+    margin: 40px 0 0;
+  }
+
+  footer {
+    margin-top: 22px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--meta);
+  }
+
+  footer nav { margin-bottom: 8px; }
+
+  footer a { color: var(--meta); text-decoration: underline; text-underline-offset: 3px; }
+
+  footer a:hover { color: var(--ink); }
+
+  footer .sep { color: var(--faint); padding: 0 6px; }
+
+  @media (min-width: 700px) {
+    .wrap { padding: 28px 28px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="wordmark"><a href="../">STASH</a> <span class="slash">/ SUPPORT</span></p>
+      <p class="subhead">
+        <span>Support</span>
+        <span>Version 1.0</span>
+      </p>
+    </header>
+
+    <main>
+      <h1>Support</h1>
+      <div class="rule"></div>
+      <p class="lead">Stash is a link saver for iPhone. You send it a link from any app and it keeps that link with the page title, so you can find it again later. You can tag links, file them into collections, add a note, search everything you have saved, and export the lot as a JSON file. It all lives <strong>on your device</strong>: no account to make, nothing to sync, no ads.</p>
+
+      <section>
+        <p class="eyebrow">How it works</p>
+        <h2>Saving a link from any app</h2>
+        <ol class="steps">
+          <li>
+            <span>
+              <span class="step-title">Tap the share button</span>
+              <span class="step-body">In any app that can share a link, Safari and YouTube and Mail included, tap share on the thing you want to keep.</span>
+            </span>
+          </li>
+          <li>
+            <span>
+              <span class="step-title">Pick Stash</span>
+              <span class="step-body">Choose Stash from the row of apps. The first time, you may need to scroll that row to the end, tap <span class="ui">More</span>, and switch Stash on.</span>
+            </span>
+          </li>
+          <li>
+            <span>
+              <span class="step-title">Tap Done</span>
+              <span class="step-body">The link is saved the moment the sheet opens. Add tags or file it into a collection right there if you want, then tap <span class="ui">Done</span>. Shared the wrong thing? Tap <span class="ui">Undo</span>.</span>
+            </span>
+          </li>
+        </ol>
+      </section>
+
+      <section>
+        <p class="eyebrow">Good to know</p>
+        <h2>Three things that surprise people</h2>
+        <dl class="notes">
+          <dt>Titles arrive on their own</dt>
+          <dd>A new link shows its URL first, then swaps to the page title once Stash has fetched it. Nothing to tap.</dd>
+
+          <dt>"Already saved"</dt>
+          <dd>Stash keeps one copy of a link. Share the same one twice and it tells you when you first saved it instead of making a duplicate.</dd>
+
+          <dt>Exporting</dt>
+          <dd>Open <span class="ui">COLLECTIONS</span> from the feed, then tap the share icon in the top bar. You get one JSON file with everything you have saved.</dd>
+        </dl>
+      </section>
+
+      <section>
+        <p class="eyebrow">Help</p>
+        <h2>Something broken, or missing?</h2>
+        <p class="secondary">Open an issue at <a class="inline" href="https://github.com/jnyst1985/stash-site/issues" rel="noopener">github.com/jnyst1985/stash-site/issues</a>, or email <a class="inline" href="mailto:jonathan.nyst@gmail.com">jonathan.nyst@gmail.com</a>.</p>
+        <p class="secondary">Tell me what you did and what happened instead. If it is about one particular link, send the URL too.</p>
+      </section>
+    </main>
+
+    <hr class="div">
+    <footer>
+      <nav>
+        <a href="../privacy/">Privacy</a><span class="sep">/</span><a href="../">Stash</a><span class="sep">/</span><a href="mailto:jonathan.nyst@gmail.com">Email</a>
+      </nav>
+      <p>Stash is made by Jonathan Nyst.</p>
+    </footer>
+  </div>
+</body>
+</html>
