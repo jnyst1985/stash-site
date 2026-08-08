@@ -1,0 +1,19 @@
+{
+  // Assets-only Worker serving this repo as the STASH public site on
+  // getstash.link (pattern borrowed from rentvsbuymath). No code, no build.
+  //
+  // Deploy: `wrangler deploy` from this directory - REQUIRED after every
+  // content change. GitHub Pages (jnyst1985.github.io/stash-site) updates
+  // itself on push, but getstash.link serves this worker's last-deployed
+  // snapshot; push alone leaves the branded domain stale.
+  "name": "getstash-site",
+  "compatibility_date": "2026-08-08",
+  "assets": {
+    "directory": "."
+  },
+  "workers_dev": false,
+  "routes": [
+    { "pattern": "getstash.link", "custom_domain": true },
+    { "pattern": "www.getstash.link", "custom_domain": true }
+  ]
+}
