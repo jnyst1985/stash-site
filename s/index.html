@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>STASH / Shared links</title>
+<meta name="description" content="Open a collection of links someone shared with you from STASH.">
+<meta name="apple-itunes-app" content="app-id=6798670709">
+<link rel="canonical" href="https://getstash.link/s">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://getstash.link/s">
+<meta property="og:title" content="Links shared from STASH">
+<meta property="og:description" content="Someone saved these links with STASH and shared them with you. No app needed to read them.">
+<meta property="og:image" content="https://getstash.link/og-share.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="STASH">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#EEEDE8">
+<style>
+  :root {
+    --canvas: #EEEDE8;
+    --card: #FFFFFF;
+    --soft: #F4F3EE;
+    --ink: #131313;
+    --body-secondary: #5C5A53;
+    --micro: #7C7A73;
+    --meta: #9A988F;
+    --faint: #B4B2AC;
+    --border-card: #E4E1D9;
+    --divider: #E2E1DC;
+    --accent: #FF6766;
+    --crimson: #CA2851;
+    --sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+    --mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 620px;
+    margin: 0 auto;
+    padding: 18px 18px 56px;
+  }
+
+  .wordmark {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1.5px;
+    line-height: 1;
+    margin: 0;
+  }
+
+  .wordmark a { color: var(--ink); text-decoration: none; }
+  .wordmark a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  .wordmark .slash { color: var(--faint); }
+
+  /* Exactly one of these three is visible at a time. */
+  .state { display: none; }
+  .state.visible { display: block; }
+
+  /* Empty-fragment and damaged states: a short centered message + CTA. */
+  .message { margin-top: 40px; text-align: center; }
+
+  .message p {
+    margin: 0 0 24px;
+    font-size: 17px;
+    color: var(--body-secondary);
+    max-width: 40ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .pill-row { display: flex; justify-content: center; }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent);
+    color: #FFFFFF;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-decoration: none;
+    padding: 14px 24px;
+    border-radius: 999px;
+    white-space: nowrap;
+    transition: background 0.15s ease;
+  }
+
+  .pill:hover, .pill:focus-visible { background: var(--crimson); }
+  .pill:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+  /* Decoded state. */
+  #state-decoded { margin-top: 28px; }
+
+  #share-name {
+    font-weight: 600;
+    font-size: clamp(28px, 8vw, 38px);
+    letter-spacing: -0.5px;
+    line-height: 1.15;
+    text-transform: uppercase;
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .rule {
+    height: 3px;
+    width: 64px;
+    margin: 20px 0 18px;
+    border-radius: 2px;
+    background: linear-gradient(105deg, var(--crimson) 0%, var(--accent) 100%);
+  }
+
+  #share-meta {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--micro);
+    margin: 0 0 20px;
+  }
+
+  .rows {
+    background: var(--card);
+    border: 1.5px solid var(--border-card);
+    border-radius: 18px;
+    overflow: hidden;
+    margin: 0 0 28px;
+  }
+
+  .row {
+    display: block;
+    padding: 15px 16px;
+    border-top: 1px solid var(--divider);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .row:first-child { border-top: 0; }
+
+  a.row:hover, a.row:focus-visible { background: var(--soft); }
+
+  .row-title {
+    display: block;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: -0.2px;
+    margin-bottom: 3px;
+    overflow-wrap: anywhere;
+  }
+
+  .row-host {
+    display: block;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.3px;
+    color: var(--crimson);
+    overflow-wrap: anywhere;
+  }
+
+  .row-summary {
+    display: block;
+    margin-top: 5px;
+    font-size: 14px;
+    color: var(--body-secondary);
+  }
+
+  #state-decoded footer {
+    margin-top: 22px;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    color: var(--meta);
+  }
+
+  @media (min-width: 700px) {
+    .wrap { padding: 28px 28px 64px; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <p class="wordmark"><a href="../">STASH</a> <span class="slash">/ SHARED</span></p>
+    </header>
+
+    <main>
+      <div id="state-empty" class="state visible">
+        <div class="message">
+          <p>This is where shared STASH links open.</p>
+          <div class="pill-row">
+            <a class="pill" href="https://apps.apple.com/app/id6798670709?ct=shared-link" target="_blank" rel="noopener noreferrer">GET STASH FOR iPHONE</a>
+          </div>
+        </div>
+      </div>
+
+      <div id="state-decoded" class="state">
+        <h1 id="share-name"></h1>
+        <div class="rule"></div>
+        <p id="share-meta"></p>
+        <div id="share-rows" class="rows"></div>
+        <div class="pill-row">
+          <a class="pill" href="https://apps.apple.com/app/id6798670709?ct=shared-link" target="_blank" rel="noopener noreferrer">GET STASH FOR iPHONE</a>
+        </div>
+        <footer>SHARED FROM STASH</footer>
+      </div>
+
+      <div id="state-damaged" class="state">
+        <div class="message">
+          <p>This share link is damaged or too old. Ask for a fresh one.</p>
+          <div class="pill-row">
+            <a class="pill" href="https://apps.apple.com/app/id6798670709?ct=shared-link" target="_blank" rel="noopener noreferrer">GET STASH FOR iPHONE</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    // Mirrors ShareCodec.urlBudget in StashKit: no legitimate fragment exceeds
+    // this, so an oversize one is rejected before any decode work runs.
+    var FRAGMENT_LIMIT = 8192;
+
+    function show(id) {
+      document.querySelectorAll('.state').forEach(function (el) {
+        el.classList.toggle('visible', el.id === id);
+      });
+    }
+
+    function base64UrlToBytes(b64url) {
+      var b64 = b64url.replace(/-/g, '+').replace(/_/g, '/');
+      while (b64.length % 4 !== 0) b64 += '=';
+      var binary;
+      try {
+        binary = atob(b64);
+      } catch (e) {
+        return null;
+      }
+      var bytes = new Uint8Array(binary.length);
+      for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      return bytes;
+    }
+
+    // Shape validation only: v === 1, n is a string, l is an array of
+    // {t, u, h, s?} strings. Whether u is actually a usable link is decided
+    // per-row at render time, never here - one bad row must not sink the rest.
+    function validate(obj) {
+      if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return null;
+      if (obj.v !== 1) return null;
+      if (typeof obj.n !== 'string') return null;
+      if (!Array.isArray(obj.l)) return null;
+
+      var items = [];
+      for (var i = 0; i < obj.l.length; i++) {
+        var row = obj.l[i];
+        if (!row || typeof row !== 'object' || Array.isArray(row)) return null;
+        if (typeof row.t !== 'string') return null;
+        if (typeof row.u !== 'string') return null;
+        if (typeof row.h !== 'string') return null;
+        if (row.s !== undefined && typeof row.s !== 'string') return null;
+        items.push({ t: row.t, u: row.u, h: row.h, s: typeof row.s === 'string' ? row.s : null });
+      }
+      return { name: obj.n, items: items };
+    }
+
+    // fragment -> base64url -> bytes -> DecompressionStream('deflate-raw') -> JSON.
+    // Any failure at any stage (bad base64, bad deflate, bad JSON, bad shape)
+    // resolves to null, which the caller renders as the damaged state.
+    async function decodeFragment(fragment) {
+      var bytes = base64UrlToBytes(fragment);
+      if (!bytes || bytes.length === 0) return null;
+      try {
+        var stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+        var buf = await new Response(stream).arrayBuffer();
+        var json = new TextDecoder('utf-8', { fatal: true }).decode(buf);
+        return validate(JSON.parse(json));
+      } catch (err) {
+        return null;
+      }
+    }
+
+    // Render is the only place payload data reaches the DOM: createElement +
+    // textContent exclusively, never innerHTML. A link only becomes an <a>
+    // once new URL(u) parses AND the protocol is http/https; otherwise the
+    // row is plain text (title + host, no anchor, no summary).
+    function buildRow(item) {
+      var validURL = null;
+      try {
+        var u = new URL(item.u);
+        if (u.protocol === 'http:' || u.protocol === 'https:') validURL = u;
+      } catch (e) {
+        validURL = null;
+      }
+
+      var el = document.createElement(validURL ? 'a' : 'div');
+      el.className = 'row';
+      if (validURL) {
+        el.href = validURL.href;
+        el.target = '_blank';
+        el.rel = 'noopener noreferrer';
+      }
+
+      var title = document.createElement('span');
+      title.className = 'row-title';
+      title.textContent = item.t;
+      el.appendChild(title);
+
+      var host = document.createElement('span');
+      host.className = 'row-host';
+      host.textContent = item.h;
+      el.appendChild(host);
+
+      if (validURL && item.s) {
+        var summary = document.createElement('span');
+        summary.className = 'row-summary';
+        summary.textContent = item.s;
+        el.appendChild(summary);
+      }
+
+      return el;
+    }
+
+    function renderDecoded(payload) {
+      document.getElementById('share-name').textContent = payload.name;
+
+      var count = payload.items.length;
+      document.getElementById('share-meta').textContent =
+        count + (count === 1 ? ' LINK' : ' LINKS');
+
+      var rows = document.getElementById('share-rows');
+      while (rows.firstChild) rows.removeChild(rows.firstChild);
+      payload.items.forEach(function (item) {
+        rows.appendChild(buildRow(item));
+      });
+    }
+
+    var hash = window.location.hash;
+    if (!hash || hash.length <= 1) return; // bare visit: state-empty stays as-is
+
+    var fragment = hash.slice(1);
+    document.getElementById('state-empty').classList.remove('visible');
+
+    if (fragment.length > FRAGMENT_LIMIT || typeof DecompressionStream === 'undefined') {
+      show('state-damaged');
+      return;
+    }
+
+    decodeFragment(fragment).then(function (payload) {
+      if (!payload) { show('state-damaged'); return; }
+      renderDecoded(payload);
+      show('state-decoded');
+    });
+  })();
+  </script>
+</body>
+</html>
