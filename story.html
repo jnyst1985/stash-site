@@ -5,9 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>STASH / Link saver for iPhone</title>
 <meta name="description" content="Stash saves links from any app to your iPhone, with the real page title, collections, tags, notes and search. Everything stays on your device. Free, no account.">
-<!-- Homepage variant under review, not a page anyone should land on from search. -->
-<meta name="robots" content="noindex">
+<meta name="apple-itunes-app" content="app-id=6798670709">
+<link rel="canonical" href="https://getstash.link/">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://getstash.link/">
+<meta property="og:title" content="STASH / Link saver for iPhone">
+<meta property="og:description" content="Save it. Forget it. Find it anyway. A link saver for iPhone that keeps everything on your device. Free, no account.">
+<meta property="og:site_name" content="STASH">
+<meta name="twitter:card" content="summary">
 <meta name="theme-color" content="#EEEDE8">
 <style>
   /* Space Grotesk and Space Mono, SIL Open Font License, embedded as latin
@@ -95,6 +101,7 @@
     background: linear-gradient(105deg, var(--crimson) 0%, var(--accent) 100%);
   }
 
+  /* The app's sub-header row: two micro labels, one at each edge. */
   .subhead {
     display: flex;
     justify-content: space-between;
@@ -107,51 +114,22 @@
     color: var(--micro);
   }
 
-  /* ---------- The statistic, promoted to the hook ---------- */
-
-  .stat-block {
-    margin: 30px 0 0;
-    font-size: 16px;
-    font-weight: 400;
-    border-top: 1.5px solid var(--ink);
-    padding-top: 16px;
-  }
-
-  .stat-fig {
-    display: block;
-    font-family: var(--mono);
-    font-weight: 700;
-    font-size: clamp(52px, 18vw, 82px);
-    line-height: 1;
-    letter-spacing: -1px;
-  }
-
-  .stat-claim {
-    display: block;
-    margin-top: 14px;
+  h1 {
     font-weight: 600;
-    font-size: clamp(26px, 7.2vw, 37px);
+    font-size: clamp(32px, 9vw, 46px);
     letter-spacing: -1px;
-    line-height: 1.1;
+    line-height: 1.05;
+    margin: 30px 0 0;
   }
 
-  .stat-note {
-    margin: 14px 0 0;
-    font-family: var(--mono);
-    font-size: 11px;
-    line-height: 1.6;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-    color: var(--micro);
-    max-width: 34ch;
-  }
-
-  .turn {
-    margin: 20px 0 0;
+  .lead {
+    margin: 18px 0 0;
     font-size: 17px;
     max-width: 44ch;
     color: var(--body-secondary);
   }
+
+  .lead strong { color: var(--ink); font-weight: 500; }
 
   /* ---------- Download badge ----------
      Apple's own artwork, inlined. It is never recolored or restyled: the only
@@ -160,6 +138,8 @@
 
   .cta { margin-top: 22px; }
 
+  /* Clear space on three sides; on the left the page gutter already provides
+     far more than the guideline needs, so the badge stays flush with the column. */
   .badge {
     display: inline-block;
     line-height: 0;
@@ -188,7 +168,7 @@
      Real 1.0 captures, unretouched, sat in an ink bezel on the cream page.
      The images carry their own status bar, so the frame is bezel only. */
 
-  .showcase { margin: 22px 0 0; }
+  .showcase { margin: 30px 0 0; }
 
   .phone {
     width: 100%;
@@ -220,7 +200,7 @@
 
   /* ---------- Sections ---------- */
 
-  section { margin-top: 48px; }
+  section { margin-top: 56px; }
 
   .eyebrow {
     margin: 0 0 7px;
@@ -238,7 +218,14 @@
     font-size: clamp(22px, 6vw, 27px);
     letter-spacing: -0.5px;
     line-height: 1.2;
-    margin: 0;
+    margin: 0 0 12px;
+  }
+
+  h3 {
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: -0.2px;
+    margin: 0 0 4px;
   }
 
   p { margin: 0 0 14px; }
@@ -257,30 +244,37 @@
 
   a.inline:hover { color: var(--crimson); }
 
-  /* ---------- The three-beat saving strip ---------- */
+  /* ---------- The one statistic on the page ---------- */
 
-  .strip {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 14px 0 0;
-    font-family: var(--mono);
-    font-weight: 700;
-    font-size: 11px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
+  .stat {
+    margin: 24px 0 0;
+    border-top: 1.5px solid var(--ink);
+    padding-top: 14px;
   }
 
-  .strip .arrow { color: var(--accent); font-weight: 400; }
+  .stat-fig {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: clamp(48px, 17vw, 78px);
+    line-height: 1;
+    letter-spacing: -1px;
+    margin: 0;
+  }
+
+  .stat-note {
+    margin: 12px 0 0;
+    font-family: var(--mono);
+    font-size: 11px;
+    line-height: 1.6;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    color: var(--micro);
+    max-width: 34ch;
+  }
 
   /* ---------- Recognition cards ---------- */
 
-  .personas {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-    margin-top: 18px;
-  }
+  .cards { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
 
   .card {
     background: var(--card);
@@ -301,11 +295,88 @@
 
   .card p { font-size: 15px; }
 
-  /* ---------- The manifest ---------- */
+  /* ---------- Numbered steps ---------- */
+
+  ol.steps { list-style: none; margin: 20px 0 0; padding: 0; }
+
+  ol.steps li {
+    display: flex;
+    gap: 12px;
+    padding: 11px 0;
+    border-top: 1px solid var(--divider);
+  }
+
+  ol.steps li:first-child { border-top: 0; padding-top: 0; }
+  ol.steps li:last-child { padding-bottom: 0; }
+
+  ol.steps .step-n {
+    flex: none;
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--accent);
+    padding-top: 4px;
+  }
+
+  ol.steps .step-body { font-size: 15px; color: var(--body-secondary); }
+  ol.steps .step-body strong { color: var(--ink); font-weight: 500; }
+
+  /* ---------- Feature list ---------- */
+
+  dl.features { margin: 20px 0 0; }
+
+  dl.features dt {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-top: 18px;
+  }
+
+  dl.features dt:first-child { margin-top: 0; }
+
+  dl.features dd {
+    margin: 5px 0 0;
+    font-size: 15px;
+    color: var(--body-secondary);
+  }
+
+  /* ---------- The one inverted block ---------- */
+
+  .inverted {
+    background: var(--ink);
+    color: var(--canvas);
+    border-radius: 18px;
+    padding: 22px 20px;
+    margin: 0 0 16px;
+  }
+
+  .inverted p {
+    margin: 0;
+    font-weight: 600;
+    font-size: clamp(21px, 5.6vw, 26px);
+    letter-spacing: -0.5px;
+    line-height: 1.25;
+  }
+
+  .inverted .said {
+    display: block;
+    margin-top: 12px;
+    font-family: var(--mono);
+    font-weight: 400;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  /* ---------- What it does not do ---------- */
 
   ul.nots {
     list-style: none;
-    margin: 18px 0 0;
+    margin: 20px 0 0;
     padding: 0;
   }
 
@@ -340,17 +411,6 @@
 
   ul.nots .qualifier { color: var(--body-secondary); }
 
-  .footnote {
-    margin: 20px 0 0;
-    border-left: 2px solid var(--accent);
-    padding-left: 12px;
-    font-family: var(--mono);
-    font-size: 11px;
-    line-height: 1.7;
-    letter-spacing: 0.3px;
-    color: var(--micro);
-  }
-
   .never {
     background: var(--soft);
     border: 1.5px solid var(--border-card);
@@ -364,22 +424,12 @@
 
   /* ---------- Closing ---------- */
 
-  .closing { margin-top: 48px; border-top: 1.5px solid var(--ink); padding-top: 26px; }
-
-  .closing h2 { margin-bottom: 4px; }
-
-  .more {
-    margin: 18px 0 0;
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
+  .closing { margin-top: 56px; border-top: 1.5px solid var(--ink); padding-top: 26px; }
 
   hr.div {
     border: 0;
     border-top: 1px solid var(--divider);
-    margin: 40px 0 0;
+    margin: 44px 0 0;
   }
 
   footer {
@@ -403,14 +453,10 @@
 
   footer p { margin: 0; }
 
-  @media (min-width: 560px) {
-    .personas { grid-template-columns: 1fr 1fr; }
-  }
-
   @media (min-width: 700px) {
     .wrap { padding: 28px 28px 64px; }
     .hero { padding-top: 7vh; }
-    section { margin-top: 58px; }
+    section { margin-top: 68px; }
   }
 </style>
 </head>
@@ -432,12 +478,8 @@
     </header>
 
     <main>
-      <h1 class="stat-block">
-        <span class="stat-fig">90-95%</span>
-        <span class="stat-claim">Of saved articles are never reopened.</span>
-      </h1>
-      <p class="stat-note">Studies put it in that range. A fact about the category, not a Stash number.</p>
-      <p class="turn">Stash is built for the day you need it back.</p>
+      <h1>Save it.<br>Forget it.<br>Find it anyway.</h1>
+      <p class="lead">Send Stash a link from any app and it keeps that link with the real page title, on <strong>your device only</strong>. Two seconds to save. Months later, a half-remembered word is enough to get it back.</p>
 
       <div class="cta">
         <a class="badge" href="https://apps.apple.com/app/id6798670709?ct=website" aria-label="Download STASH on the App Store">
@@ -446,96 +488,145 @@
         <p class="cta-note">Free &middot; No account &middot; Nothing leaves your phone</p>
       </div>
 
+      <div class="showcase">
+        <div class="phone">
+          <img src="assets/app-feed.jpg" width="780" height="1694" alt="The STASH feed on an iPhone, listing saved links with their page titles, the collection each one is filed in, and how long ago it was saved.">
+        </div>
+        <p class="phone-cap">Everything you saved, newest first</p>
+      </div>
+
       <section>
-        <p class="eyebrow"><span class="num">01</span> / The feed</p>
-        <h2>Everything you saved, newest first</h2>
-        <div class="showcase">
-          <div class="phone">
-            <img src="assets/app-feed.jpg" width="780" height="1694" alt="The STASH feed on an iPhone, listing saved links with their page titles, the collection each one is filed in, and how long ago it was saved.">
-          </div>
-          <p class="phone-cap">Page title, source, and how long ago you saved it</p>
+        <p class="eyebrow"><span class="num">01</span> / The pile</p>
+        <h2>Almost nothing you save gets opened again</h2>
+        <p class="secondary">This is not a discipline problem. Saving is a two-second act your brain files as progress. Reading is twenty minutes of actual work. Those two were never going to compete fairly, in any app, for anybody.</p>
+        <p class="secondary">So the pile grows. And somewhere along the way it stops looking like a library and starts looking like a list of promises you did not keep. That is usually the point where people stop opening the app at all.</p>
+
+        <div class="stat">
+          <p class="stat-fig">90-95%</p>
+          <p class="stat-note">Of saved articles are never reopened. Studies put it in that range, and it holds whatever app people use. It is a fact about the category, not a Stash number.</p>
         </div>
       </section>
 
       <section>
-        <p class="eyebrow"><span class="num">02</span> / Saving</p>
-        <h2>Anything with a share button</h2>
-        <p class="strip">
-          <span>Share</span>
-          <span class="arrow" aria-hidden="true">&rarr;</span>
-          <span>Stash</span>
-          <span class="arrow" aria-hidden="true">&rarr;</span>
-          <span>Done</span>
-        </p>
+        <p class="eyebrow"><span class="num">02</span> / The reframe</p>
+        <h2>Reading was never the job</h2>
+        <p class="secondary">When you save something you are really doing two things. Catching the thought <em>this looks important</em> before it scrolls away. And making the thing findable on the day it turns out to matter. Most of the time the second one was the whole point, and the reading was a story you told yourself on the way past.</p>
+        <p class="secondary">Which makes this a retrieval problem wearing a reading problem's clothes. Stash is built for the retrieval half and nothing else. There is no reader mode, no stripped copy of the page, no progress bar hanging over your library. You tap a link and it opens the original in your browser, the way it was published.</p>
+      </section>
+
+      <section>
+        <p class="eyebrow"><span class="num">03</span> / Sound familiar</p>
+        <h2>Four ways people end up here</h2>
+        <div class="cards">
+          <div class="card">
+            <span class="card-label">The tab closer</span>
+            <p class="secondary">Thirty tabs open, and you save them to close them. The saving is the relief. What was meant to happen afterwards was never really the plan.</p>
+          </div>
+          <div class="card">
+            <span class="card-label">The project</span>
+            <p class="secondary">A course, a launch, a renovation. You are gathering things for one thing, and you want all of it in front of you on the evening you sit down to do it.</p>
+          </div>
+          <div class="card">
+            <span class="card-label">The library</span>
+            <p class="secondary">Recipes, gear, places to eat. Not a queue, a collection. You go back to it on a Saturday, when the moment for it finally arrives.</p>
+          </div>
+          <div class="card">
+            <span class="card-label">The one that went away</span>
+            <p class="secondary">You kept a library somewhere else for years. Then there was an announcement, an export window, and nothing.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <p class="eyebrow"><span class="num">04</span> / Saving</p>
+        <h2>Two seconds, from any app</h2>
+        <p class="secondary">Anything with a share button can send a link to Stash. Safari, YouTube, Mail, whatever you happen to be in.</p>
+        <ol class="steps">
+          <li>
+            <span class="step-n">01</span>
+            <span class="step-body">Tap share on the thing you want to keep.</span>
+          </li>
+          <li>
+            <span class="step-n">02</span>
+            <span class="step-body">Pick Stash from the row of apps.</span>
+          </li>
+          <li>
+            <span class="step-n">03</span>
+            <span class="step-body"><strong>It is already saved.</strong> The link is kept the moment the sheet opens, so there is no confirm step to get wrong. Add a tag, a collection or a note if you want one, then tap Done.</span>
+          </li>
+        </ol>
         <div class="showcase">
           <div class="phone">
             <img src="assets/app-share-sheet.jpg" width="780" height="1694" alt="An article open in another app with the iOS share sheet raised over it, showing STASH sitting in the row of apps you can send the link to." loading="lazy">
           </div>
-          <p class="phone-cap">Two seconds to save</p>
+          <p class="phone-cap">Wherever you already are</p>
+        </div>
+
+        <div class="never">
+          <span class="card-label">The titles arrive on their own</span>
+          <p class="secondary">A new link shows its URL first, then swaps to the real page title once Stash has fetched it. Nothing to tap, and nothing that reads "Untitled" when you come back to it in March.</p>
         </div>
       </section>
 
       <section>
-        <p class="eyebrow"><span class="num">03</span> / Finding</p>
-        <h2>A fragment is usually enough</h2>
+        <p class="eyebrow"><span class="num">05</span> / Finding</p>
+        <h2>Built for the day you need it back</h2>
+        <p class="secondary">Retrieval almost never starts with the full title. It starts with a fragment: one word you remember, the site it was on, a vague sense that it was a video. Search in Stash runs across titles, tags, sources and your own notes, so the fragment is usually enough.</p>
+        <dl class="features">
+          <dt>Collections</dt>
+          <dd>One place per project. Everything you gathered for the renovation, sitting together.</dd>
+
+          <dt>Tags</dt>
+          <dd>Cut across collections. A link can carry as many as it needs.</dd>
+
+          <dt>Notes</dt>
+          <dd>One line about why you saved it. This is the one everybody skips and then wishes they had not: the reason is obvious at the moment you save, and completely gone by March.</dd>
+        </dl>
+
         <div class="showcase">
           <div class="phone">
             <img src="assets/app-search.jpg" width="780" height="1694" alt="Search in STASH part way through the word deep, already showing matching saved links, with one result matched on the note the reader wrote rather than the title." loading="lazy">
           </div>
-          <p class="phone-cap">Titles, tags, sources and your own notes</p>
+          <p class="phone-cap">A fragment is usually enough</p>
         </div>
       </section>
 
       <section>
-        <p class="eyebrow"><span class="num">04</span> / Sound familiar</p>
-        <h2>Four ways people end up here</h2>
-        <div class="personas">
-          <div class="card">
-            <span class="card-label">The tab closer</span>
-            <p class="secondary">Thirty tabs open, and you save them to close them.</p>
-          </div>
-          <div class="card">
-            <span class="card-label">The project</span>
-            <p class="secondary">A course, a launch, a renovation, gathered in one place.</p>
-          </div>
-          <div class="card">
-            <span class="card-label">The library</span>
-            <p class="secondary">Recipes, gear, places to eat. Not a queue, a collection.</p>
-          </div>
-          <div class="card">
-            <span class="card-label">The one that went away</span>
-            <p class="secondary">You kept a library somewhere else. Then an export window, and nothing.</p>
-          </div>
-        </div>
-      </section>
-
-      <section>
-        <p class="eyebrow"><span class="num">05</span> / Owning it</p>
+        <p class="eyebrow"><span class="num">06</span> / Owning it</p>
         <h2>There is no server to shut down</h2>
+        <div class="inverted">
+          <p>Pocket closed in July 2025. Millions of people got an export window, and then their library was somebody else's decision.
+          <span class="said">If you do not own the server, you do not own your saves</span></p>
+        </div>
+        <p class="secondary">Stash does not have a server. Your links live in the app, on your phone. There is no account to lose, no subscription to lapse, no sync to break, and nothing here for me to switch off one day.</p>
+        <p class="secondary">And if you want everything out, Stash hands you the lot as a single JSON file whenever you ask. Every link, every tag, every note, every collection. No reason required, no window to catch.</p>
+      </section>
+
+      <section>
+        <p class="eyebrow"><span class="num">07</span> / The honest part</p>
+        <h2>What Stash does not do</h2>
         <ul class="nots">
-          <li><span class="marker" aria-hidden="true"></span><span><span class="head">No server</span> <span class="qualifier">Your links live in the app, on your phone.</span></span></li>
           <li><span class="marker" aria-hidden="true"></span><span><span class="head">No account</span> <span class="qualifier">No sign-up, no email address, no password.</span></span></li>
-          <li><span class="marker" aria-hidden="true"></span><span><span class="head">No subscription</span> <span class="qualifier">Stash is free. There is nothing to upgrade to.</span></span></li>
           <li><span class="marker" aria-hidden="true"></span><span><span class="head">No ads</span> <span class="qualifier">None in the app, and none planned.</span></span></li>
-          <li><span class="marker" aria-hidden="true"></span><span><span class="head">No sync</span> <span class="qualifier">One phone. That is the trade for having no server.</span></span></li>
-          <li><span class="marker" aria-hidden="true"></span><span><span class="head">Full export</span> <span class="qualifier">Every link, tag, note and collection, as one JSON file.</span></span></li>
+          <li><span class="marker" aria-hidden="true"></span><span><span class="head">No sync</span> <span class="qualifier">One phone. That is the trade you make for having no server.</span></span></li>
+          <li><span class="marker" aria-hidden="true"></span><span><span class="head">No subscription</span> <span class="qualifier">Stash is free. There is nothing to upgrade to.</span></span></li>
+          <li><span class="marker" aria-hidden="true"></span><span><span class="head">No reader mode</span> <span class="qualifier">Links open in your browser, on the page the author made.</span></span></li>
         </ul>
-        <p class="footnote">Pocket closed in July 2025. Millions of people got an export window, and then their library was somebody else's decision.</p>
         <div class="never">
           <span class="card-label">One thing that is not nothing</span>
-          <p class="secondary">Stash sends a small set of anonymized usage events. Never a URL, a title, a note or a tag. The <a class="inline" href="privacy/">privacy page</a> lists every one.</p>
+          <p class="secondary">Stash sends a small set of anonymized usage events, so I can see which parts of the app get used. It never sends what you saved: not a URL, not a title, not a note, not the name of a tag. The <a class="inline" href="privacy/">privacy page</a> lists every single event, and it is a short list.</p>
         </div>
       </section>
 
       <div class="closing">
         <h2>Get Stash</h2>
+        <p class="secondary">Free on the App Store, for iPhone. There is no account to make and nothing to set up, so it works from the first link you send it.</p>
         <div class="cta">
           <a class="badge" href="https://apps.apple.com/app/id6798670709?ct=website" aria-label="Download STASH on the App Store">
             <svg class="badge-svg" viewBox="0 0 119.66407 40" role="img" aria-hidden="true" focusable="false"><use href="#appstore-badge"></use></svg>
           </a>
           <p class="cta-note">Free &middot; No account &middot; Nothing leaves your phone</p>
         </div>
-        <p class="more"><a class="inline" href="index.html">The longer story &rarr;</a></p>
       </div>
     </main>
 
