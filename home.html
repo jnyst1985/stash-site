@@ -313,40 +313,6 @@
 
   .strip .arrow { color: var(--accent); font-weight: 400; }
 
-  /* ---------- Retrieval: the fragment field ---------- */
-
-  .frag-field {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 11px 16px;
-  }
-
-  .frag { color: var(--ink); }
-  .frag.f1 { opacity: 0.26; font-size: 15px; }
-  .frag.f2 { opacity: 0.2;  font-size: 14px; }
-  .frag.f3 { opacity: 0.32; font-size: 16px; }
-  .frag.hit { opacity: 1; font-size: 17px; font-weight: 500; }
-
-  .hitword {
-    color: var(--accent);
-    border: 1.5px solid var(--accent);
-    border-radius: 3px;
-    padding: 1px 6px;
-    margin: 0 2px;
-  }
-
-  .frag-result {
-    margin: 20px 0 0;
-    padding-top: 11px;
-    border-top: 1px solid var(--divider);
-    font-family: var(--mono);
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--micro);
-  }
-
   /* ---------- Recognition cards, with the micro-marks ----------
      The grid, the card and the label are the same bytes in variant B and in
      gallery 1, with two exceptions that are taken from the gallery because the
@@ -665,23 +631,11 @@
       <section>
         <p class="eyebrow"><span class="num">03</span> / Finding</p>
         <h2>A fragment is usually enough</h2>
-        <div class="unit">
-          <div class="frag-field">
-          <span class="frag f1">the pricing essay</span>
-          <span class="frag f2">trail shoes review</span>
-          <span class="frag f3">roasting times</span>
-          <span class="frag f2">the tax deadline post</span>
-          <span class="frag f1">kitchen shelf ideas</span>
-          <span class="frag hit">that <span class="hitword">sourdough</span> thing</span>
-          <span class="frag f3">a talk about focus</span>
-          <span class="frag f2">the long piece on sleep</span>
-          <span class="frag f1">how to fix a dripping tap</span>
-          <span class="frag f3">camera bag thread</span>
-          <span class="frag f2">the one with the charts</span>
-          <span class="frag f1">banh mi place near the office</span>
-          <span class="frag f3">that interview with the founder</span>
-            </div>
-          <p class="frag-result">1 result</p>
+        <div class="showcase">
+          <div class="phone">
+            <img src="assets/app-search.jpg" width="780" height="1694" alt="Search in STASH part way through the word deep, already showing matching saved links, with one result matched on the note the reader wrote rather than the title." loading="lazy">
+          </div>
+          <p class="phone-cap">Titles, tags, sources and your own notes</p>
         </div>
       </section>
 
