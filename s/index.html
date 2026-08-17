@@ -373,7 +373,7 @@
       if (!payload) { show('state-damaged'); return; }
       renderDecoded(payload);
       show('state-decoded');
-    });
+    }).catch(function () { show('state-damaged'); });
   })();
   </script>
 </body>
