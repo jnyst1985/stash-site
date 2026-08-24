@@ -1,0 +1,6 @@
+# wrangler's local state: the simulated KV store `wrangler dev` writes to,
+# plus its caches. Never committed, never uploaded (see .assetsignore).
+.wrangler/
+
+# Agent task reports - working notes, not site content.
+.task-*.md

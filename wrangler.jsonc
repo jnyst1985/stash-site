@@ -1,15 +1,34 @@
 {
-  // Assets-only Worker serving this repo as the STASH public site on
-  // getstash.link (pattern borrowed from rentvsbuymath). No code, no build.
+  // Worker serving this repo as the STASH public site on getstash.link: static
+  // assets exactly as before, plus the /api/* shares API in worker.js
+  // (spec: link-saver docs/superpowers/specs/2026-08-24-stash-short-share-links-design.md).
   //
   // Deploy: `wrangler deploy` from this directory - REQUIRED after every
   // content change. GitHub Pages (jnyst1985.github.io/stash-site) updates
   // itself on push, but getstash.link serves this worker's last-deployed
   // snapshot; push alone leaves the branded domain stale.
+  //
+  // BEFORE THE FIRST DEPLOY OF THE SHARES API (one-time, manual):
+  //   wrangler kv namespace create SHARES
+  // then paste the returned id over the placeholder below. The placeholder is
+  // fine for `wrangler dev`, which simulates KV locally.
   "name": "getstash-site",
+  "main": "worker.js",
   "compatibility_date": "2026-08-08",
   "assets": {
-    "directory": "."
+    "directory": ".",
+    "binding": "ASSETS"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "SHARES",
+      "id": "PLACEHOLDER_RUN_WRANGLER_KV_NAMESPACE_CREATE_SHARES"
+    }
+  ],
+  "vars": {
+    // Kill switch: "1" makes every create 503 (spec §4). Flip it by editing
+    // this and redeploying, or with `wrangler dev --var SHARES_DISABLED:1`.
+    "SHARES_DISABLED": "0"
   },
   "workers_dev": false,
   "routes": [
