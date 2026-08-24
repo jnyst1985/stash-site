@@ -42,7 +42,11 @@ export default {
       try {
         return await handleAPI(request, url, env);
       } catch (err) {
-        // A KV failure must not leak an exception page onto a branded domain.
+        // A KV failure must not leak an exception page onto a branded domain -
+        // but it must not vanish either. Caught exceptions are not logged for
+        // us, so without this line a KV outage is an opaque 500 with nothing in
+        // `wrangler tail`. console.error never reaches the client.
+        console.error(err);
         return json({ error: 'internal' }, 500);
       }
     }
@@ -129,10 +133,14 @@ async function createShare(request, env) {
   const token = base64url(crypto.getRandomValues(new Uint8Array(16)));
   const tokenHash = await sha256Hex(token);
 
-  await Promise.all([
-    env.SHARES.put(`s:${id}`, read.bytes, { expirationTtl: SHARE_TTL }),
-    env.SHARES.put(`d:${id}`, tokenHash, { expirationTtl: SHARE_TTL }),
-  ]);
+  // Sequential, and the deletion token goes FIRST - do not "optimize" these back
+  // into a Promise.all. If the second write fails, the orphan left behind should
+  // be a `d:`: a hash of a token for a share that does not exist, harmless and
+  // gone in 7 days. The reverse order orphans an envelope nobody can revoke -
+  // stored for the full 7 days, clearable only by an operator tombstone, while
+  // the client sees a failure and silently falls back to a fragment link.
+  await env.SHARES.put(`d:${id}`, tokenHash, { expirationTtl: SHARE_TTL });
+  await env.SHARES.put(`s:${id}`, read.bytes, { expirationTtl: SHARE_TTL });
 
   // Counters move only for shares that actually landed in KV: the caps exist to
   // bound stored data, and a rejected request stores nothing. A failure to bump
@@ -145,7 +153,7 @@ async function createShare(request, env) {
       env.SHARES.put(dayKey, String(dayCount + 1), { expirationTtl: DAY_TTL }),
     ]);
   } catch (err) {
-    // deliberate
+    console.error(err);
   }
 
   return json({ deletionToken: token }, 201);
@@ -211,7 +219,10 @@ async function recordReport(request, env) {
       }
     }
   } catch (err) {
-    // Bad JSON, KV trouble, anything: the caller still hears 202.
+    // Bad JSON, KV trouble, anything: the caller still hears 202. Logged
+    // because the silent case that matters is a KV outage quietly dropping
+    // every report on the floor; a malformed body logging too is cheap.
+    console.error(err);
   }
   return new Response(null, { status: 202, headers: { 'Cache-Control': 'no-store' } });
 }
@@ -265,6 +276,13 @@ async function sha256Hex(text) {
   return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
+/**
+ * Both sides are always SHA-256 hex digests, never the token itself, so a timing
+ * leak here would reveal digest bytes an attacker cannot invert back into a
+ * token - this is not load-bearing. It stays anyway because it costs nothing and
+ * a plain `===` would be one refactor away from being wrong the day someone
+ * compares a raw secret with it.
+ */
 function constantTimeEqual(a, b) {
   if (a.length !== b.length) return false;
   let diff = 0;

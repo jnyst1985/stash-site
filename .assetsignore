@@ -2,7 +2,7 @@
 .gitignore
 .assetsignore
 .wrangler
-.task-4-report.md
+.task-*
 wrangler.jsonc
 worker.js
 scripts
