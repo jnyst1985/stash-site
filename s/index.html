@@ -311,6 +311,13 @@
     // believed.
     var RETRY_DELAYS = [1500, 2500];
 
+    // Same 4s the app's ShareLinkService puts on the upload of this very
+    // envelope. fetch() has no timeout of its own, so without this a hung socket
+    // never settles and the reader sits on `Opening share...` forever - the one
+    // outcome with no way out. An abort reads as network trouble: retried, then
+    // damaged.
+    var ATTEMPT_TIMEOUT = 4000;
+
     function show(id) {
       document.querySelectorAll('.state').forEach(function (el) {
         el.classList.toggle('visible', el.id === id);
@@ -432,7 +439,10 @@
         if (attempt > 0) await delay(RETRY_DELAYS[attempt - 1]);
 
         try {
-          var response = await fetch('/api/share/' + id, { cache: 'no-store' });
+          var response = await fetch('/api/share/' + id, {
+            cache: 'no-store',
+            signal: AbortSignal.timeout(ATTEMPT_TIMEOUT),
+          });
           if (response.status === 200) {
             return { state: 'ok', bytes: new Uint8Array(await response.arrayBuffer()) };
           }
