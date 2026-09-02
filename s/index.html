@@ -365,14 +365,51 @@
     // deflated bytes -> DecompressionStream('deflate-raw') -> JSON -> shape check.
     // Both transports carry the SAME wire bytes - the short link seals them, the
     // legacy fragment base64s them - so both end here. Any failure at any stage
-    // (bad deflate, bad JSON, bad shape) resolves to null, which the caller
-    // renders as the damaged state.
+    // (bad deflate, bad JSON, bad shape, oversize output) resolves to null, which
+    // the caller renders as the damaged state.
+    //
+    // The output bound is the load-bearing part. It mirrors ShareCodec.inflate in
+    // StashKit, which allocates max(1024, input.count * 64) and hands that fixed
+    // buffer to compression_decode_buffer, so the Swift reader can never be made
+    // to write past it. Raw deflate reaches about 1032:1, so WITHOUT this a
+    // 65,536-byte envelope - sealed with the sender's own key, therefore
+    // decrypting perfectly, and arriving as an ordinary share link - inflates to
+    // roughly 67MB inside the recipient's tab and can hang or kill it. Nothing
+    // honest comes anywhere near 64x: the app deflates a few hundred KB of wire
+    // JSON at most, and the envelope cap bounds the input on top of that.
+    //
+    // Hence the chunk loop rather than one Response.arrayBuffer() call: reading
+    // the whole stream first is precisely the thing that has no bound. The shape
+    // is the Worker's readBounded, for the same reason. Do not "simplify" it back.
     async function decodeWire(bytes) {
       if (!bytes || bytes.length === 0) return null;
       try {
-        var stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
-        var buf = await new Response(stream).arrayBuffer();
-        var json = new TextDecoder('utf-8', { fatal: true }).decode(buf);
+        var limit = Math.max(1024, bytes.length * 64);
+        var reader = new Blob([bytes]).stream()
+          .pipeThrough(new DecompressionStream('deflate-raw'))
+          .getReader();
+
+        var chunks = [];
+        var total = 0;
+        while (true) {
+          var step = await reader.read();
+          if (step.done) break;
+          total += step.value.byteLength;
+          if (total > limit) {
+            await reader.cancel();
+            return null;
+          }
+          chunks.push(step.value);
+        }
+
+        var inflated = new Uint8Array(total);
+        var offset = 0;
+        for (var i = 0; i < chunks.length; i++) {
+          inflated.set(chunks[i], offset);
+          offset += chunks[i].byteLength;
+        }
+
+        var json = new TextDecoder('utf-8', { fatal: true }).decode(inflated);
         return validate(JSON.parse(json));
       } catch (err) {
         return null;
