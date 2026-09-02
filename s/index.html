@@ -72,11 +72,12 @@
   .wordmark a:hover { text-decoration: underline; text-underline-offset: 3px; }
   .wordmark .slash { color: var(--faint); }
 
-  /* Exactly one of these three is visible at a time. */
+  /* Exactly one of these five is visible at a time. */
   .state { display: none; }
   .state.visible { display: block; }
 
-  /* Empty-fragment and damaged states: a short centered message + CTA. */
+  /* Empty, loading, expired and damaged states: a short centered message,
+     with a CTA under everything except loading. */
   .message { margin-top: 40px; text-align: center; }
 
   .message p {
@@ -187,12 +188,40 @@
 
   #state-decoded footer {
     margin-top: 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
     text-align: center;
     font-family: var(--mono);
     font-size: 11px;
     letter-spacing: 1.5px;
     color: var(--meta);
   }
+
+  /* Reads as footer text, behaves as the action it is. Shown only for shares
+     that came through /s/<id> - a legacy fragment share has no server-side row
+     to report. `hidden` is spelled out here so a later display rule on this id
+     cannot quietly un-hide it. */
+  #report-share {
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    margin: 0;
+    padding: 6px 4px;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  #report-share[hidden] { display: none; }
+  #report-share:hover, #report-share:focus-visible { color: var(--ink); }
+  #report-share:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+  /* Reported: the same words the footer already speaks in, no longer a target. */
+  #report-share[disabled] { color: var(--meta); cursor: default; text-decoration: none; }
 
   @media (min-width: 700px) {
     .wrap { padding: 28px 28px 64px; }
@@ -215,6 +244,12 @@
         </div>
       </div>
 
+      <div id="state-loading" class="state">
+        <div class="message">
+          <p>Opening share...</p>
+        </div>
+      </div>
+
       <div id="state-decoded" class="state">
         <h1 id="share-name"></h1>
         <div class="rule"></div>
@@ -223,7 +258,19 @@
         <div class="pill-row">
           <a class="pill" href="https://apps.apple.com/app/id6798670709?ct=shared-link&pt=128979613" target="_blank" rel="noopener noreferrer">GET STASH FOR iPHONE</a>
         </div>
-        <footer>SHARED FROM STASH</footer>
+        <footer>
+          <span>SHARED FROM STASH</span>
+          <button type="button" id="report-share" hidden>REPORT THIS SHARE</button>
+        </footer>
+      </div>
+
+      <div id="state-expired" class="state">
+        <div class="message">
+          <p>This share has expired or was removed. Ask the sender for a fresh one.</p>
+          <div class="pill-row">
+            <a class="pill" href="https://apps.apple.com/app/id6798670709?ct=shared-link&pt=128979613" target="_blank" rel="noopener noreferrer">GET STASH FOR iPHONE</a>
+          </div>
+        </div>
       </div>
 
       <div id="state-damaged" class="state">
@@ -244,6 +291,25 @@
     // Mirrors ShareCodec.urlBudget in StashKit: no legitimate fragment exceeds
     // this, so an oversize one is rejected before any decode work runs.
     var FRAGMENT_LIMIT = 8192;
+
+    // Mirrors ShortShareCodec.envelopeBudget, for the same reason and at the
+    // same point: nothing legitimate is bigger, so an oversize envelope is
+    // rejected before a byte of it is decrypted or handed to the inflater.
+    var ENVELOPE_LIMIT = 65536;
+
+    // 22 base64url chars = the 16 random bytes ShortShareCodec generates. The
+    // Worker tests the same shape before it rewrites /s/<id> to this document.
+    var SHORT_LINK_RE = /^\/s\/([A-Za-z0-9_-]{22})$/;
+
+    // Envelope layout, pinned by spec §1: 0x01 || nonce(12) || ciphertext+tag(16).
+    var ENVELOPE_VERSION = 1;
+    var NONCE_LENGTH = 12;
+    var TAG_LENGTH = 16;
+
+    // KV is eventually consistent: a share created seconds ago can still miss at
+    // a far edge. Three attempts spread across ~4s, and only then is a miss
+    // believed.
+    var RETRY_DELAYS = [1500, 2500];
 
     function show(id) {
       document.querySelectorAll('.state').forEach(function (el) {
@@ -287,11 +353,12 @@
       return { name: obj.n, items: items };
     }
 
-    // fragment -> base64url -> bytes -> DecompressionStream('deflate-raw') -> JSON.
-    // Any failure at any stage (bad base64, bad deflate, bad JSON, bad shape)
-    // resolves to null, which the caller renders as the damaged state.
-    async function decodeFragment(fragment) {
-      var bytes = base64UrlToBytes(fragment);
+    // deflated bytes -> DecompressionStream('deflate-raw') -> JSON -> shape check.
+    // Both transports carry the SAME wire bytes - the short link seals them, the
+    // legacy fragment base64s them - so both end here. Any failure at any stage
+    // (bad deflate, bad JSON, bad shape) resolves to null, which the caller
+    // renders as the damaged state.
+    async function decodeWire(bytes) {
       if (!bytes || bytes.length === 0) return null;
       try {
         var stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
@@ -301,6 +368,107 @@
       } catch (err) {
         return null;
       }
+    }
+
+    // Legacy transport: fragment -> base64url -> wire bytes. Unchanged, forever -
+    // every link shared before short links existed still arrives this way.
+    function decodeFragment(fragment) {
+      return decodeWire(base64UrlToBytes(fragment));
+    }
+
+    // Short-link transport: envelope -> AES-128-GCM -> the same wire bytes. The
+    // key comes from the fragment, which no browser sends upstream, so the server
+    // that stored these bytes cannot be the one that opens them.
+    async function decodeEnvelope(bytes, id, key) {
+      if (bytes.length > ENVELOPE_LIMIT) return null;
+      if (bytes.length < 1 + NONCE_LENGTH + TAG_LENGTH) return null;
+
+      // The AAD below authenticates the PINNED version 1, not the byte that
+      // actually arrived - so GCM cannot be what rejects a future v2 envelope.
+      // This gate is. Never fold it into the decrypt.
+      if (bytes[0] !== ENVELOPE_VERSION) return null;
+
+      var keyBytes = base64UrlToBytes(key);
+      if (!keyBytes || keyBytes.length !== 16) return null;
+
+      // Spec §1: version byte || ascii(id). Binds an envelope to its slot, so a
+      // blob copied to another id fails to open even for someone holding the
+      // right key. The id is 22 base64url chars, so charCodeAt is ascii here.
+      var aad = new Uint8Array(1 + id.length);
+      aad[0] = ENVELOPE_VERSION;
+      for (var i = 0; i < id.length; i++) aad[i + 1] = id.charCodeAt(i);
+
+      try {
+        var cryptoKey = await crypto.subtle.importKey('raw', keyBytes, 'AES-GCM', false, ['decrypt']);
+        // WebCrypto wants the tag appended to the ciphertext, which is exactly
+        // the layout CryptoKit's `.combined` produced on the way in.
+        var plaintext = await crypto.subtle.decrypt(
+          {
+            name: 'AES-GCM',
+            iv: bytes.subarray(1, 1 + NONCE_LENGTH),
+            additionalData: aad,
+            tagLength: 128,
+          },
+          cryptoKey,
+          bytes.subarray(1 + NONCE_LENGTH)
+        );
+        return decodeWire(new Uint8Array(plaintext));
+      } catch (err) {
+        return null;
+      }
+    }
+
+    function delay(ms) {
+      return new Promise(function (resolve) { setTimeout(resolve, ms); });
+    }
+
+    // Three outcomes, matching what the API can say: the envelope bytes, `expired`
+    // (a miss the retries did not cure, or an operator tombstone), or `damaged`
+    // (anything else - a 5xx, a dropped connection, a body that would not read).
+    async function fetchEnvelope(id) {
+      var missed = false;
+
+      for (var attempt = 0; attempt <= RETRY_DELAYS.length; attempt++) {
+        if (attempt > 0) await delay(RETRY_DELAYS[attempt - 1]);
+
+        try {
+          var response = await fetch('/api/share/' + id, { cache: 'no-store' });
+          if (response.status === 200) {
+            return { state: 'ok', bytes: new Uint8Array(await response.arrayBuffer()) };
+          }
+          // A tombstone is an operator's decision, not a race - never retried.
+          if (response.status === 410) return { state: 'expired' };
+          if (response.status === 404) missed = true;
+        } catch (err) {
+          // Network trouble. Retry, and fall through to `damaged` if it persists.
+        }
+      }
+
+      // One 404 anywhere in the run is the server positively answering "no such
+      // share", so it outranks a flaky last attempt when picking the copy.
+      return { state: missed ? 'expired' : 'damaged' };
+    }
+
+    // Reporting needs a server-side row to point at, so the button belongs to the
+    // short-link path only. No confirmation dialog by design (spec §5): a misfire
+    // stores one row to triage, which is cheaper than a reader who gives up.
+    function wireReport(id) {
+      var button = document.getElementById('report-share');
+      button.hidden = false;
+      button.addEventListener('click', function () {
+        button.disabled = true;
+        fetch('/api/report', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: id }),
+        }).catch(function () {
+          // /api/report answers 202 to everything by design, so the only failure
+          // reachable here is the network - nothing the reader can act on, and no
+          // second attempt worth asking them for. The text swaps either way.
+        }).then(function () {
+          button.textContent = 'REPORTED - THANK YOU';
+        });
+      });
     }
 
     // Render is the only place payload data reaches the DOM: createElement +
@@ -358,10 +526,43 @@
       });
     }
 
-    var hash = window.location.hash;
-    if (!hash || hash.length <= 1) return; // bare visit: state-empty stays as-is
+    // /s/<id>#<key>: the id is the server's slot, the key never leaves the
+    // fragment, and the two halves meet only here.
+    async function openShortShare(id, key) {
+      show('state-loading');
 
-    var fragment = hash.slice(1);
+      var result = await fetchEnvelope(id);
+      if (result.state === 'expired') { show('state-expired'); return; }
+      if (result.state !== 'ok') { show('state-damaged'); return; }
+
+      var payload = await decodeEnvelope(result.bytes, id, key);
+      if (!payload) { show('state-damaged'); return; }
+
+      renderDecoded(payload);
+      wireReport(id);
+      show('state-decoded');
+    }
+
+    var match = SHORT_LINK_RE.exec(window.location.pathname);
+    var hash = window.location.hash;
+    var fragment = hash && hash.length > 1 ? hash.slice(1) : '';
+
+    if (match) {
+      // A /s/<id> whose fragment was stripped is damaged, not expired: the share
+      // may well be sitting in KV intact, and unopenable by anyone without the
+      // key that used to be here. Nothing to fetch - asking would only tell the
+      // server that someone holds this id.
+      if (!fragment || typeof DecompressionStream === 'undefined' ||
+          !window.crypto || !window.crypto.subtle) {
+        show('state-damaged');
+        return;
+      }
+      openShortShare(match[1], fragment).catch(function () { show('state-damaged'); });
+      return;
+    }
+
+    if (!fragment) return; // bare visit: state-empty stays as-is
+
     document.getElementById('state-empty').classList.remove('visible');
 
     if (fragment.length > FRAGMENT_LIMIT || typeof DecompressionStream === 'undefined') {
