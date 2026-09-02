@@ -27,9 +27,10 @@
 # ..."). `npx wrangler@latest dev` is the fix.
 # In that mode the script asserts ONLY that a well-formed create returns 503.
 #
-# Against production the same commands work with BASE_URL=https://getstash.link,
-# but note that a real run stores real shares (7-day TTL) and burns two of the
-# per-IP creates-per-hour budget.
+# The base URL is the first POSITIONAL argument, never an environment variable -
+# so against production it is `scripts/verify-shares.sh https://getstash.link`.
+# Note that a real production run stores real shares (7-day TTL) and burns two of
+# the per-IP creates-per-hour budget.
 
 set -uo pipefail
 
