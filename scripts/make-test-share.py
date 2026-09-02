@@ -2,8 +2,11 @@
 """Seal a test share and upload it, so the viewer can be opened for real.
 
 This is the python stand-in for the iPhone: it mirrors StashKit's
-`ShareCodec.compressedWire` + `ShortShareCodec.seal` byte for byte, then POSTs the
-envelope to the shares API. Authority for every value here is link-saver
+`ShareCodec.compressedWire` + `ShortShareCodec.seal` format for format, then POSTs
+the envelope to the shares API. Format, not byte for byte - zlib and Apple's
+Compression framework emit different DEFLATE streams for the same input, and both
+inflate back to identical bytes. Diffing the two outputs proves nothing; inflating
+them does. Authority for every value here is link-saver
 `docs/superpowers/specs/2026-08-24-stash-short-share-links-design.md` §1 - if this
 script and the Swift codec ever disagree, the spec settles it and BOTH are wrong
 until they agree again.
@@ -75,11 +78,13 @@ def base64url(raw: bytes) -> str:
 
 
 def compressed_wire(name: str, links: list) -> bytes:
-    """Short-key JSON -> raw DEFLATE, matching `ShareCodec.encodeJSON` exactly.
+    """Short-key JSON -> raw DEFLATE.
 
-    Sorted keys and unescaped slashes are what Swift's JSONEncoder emits with
-    `.sortedKeys, .withoutEscapingSlashes`; a nil summary is omitted, never
-    written as `"s": null`.
+    The JSON half IS byte-identical to `ShareCodec.encodeJSON`: sorted keys and
+    unescaped slashes are what Swift's JSONEncoder emits with
+    `.sortedKeys, .withoutEscapingSlashes`, and a nil summary is omitted rather
+    than written as `"s": null`. The DEFLATE half is a different encoder's
+    output that inflates to those same bytes - see the module docstring.
     """
     wire = {"l": links, "n": name, "v": WIRE_VERSION}
     raw = json.dumps(wire, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
@@ -120,6 +125,11 @@ def upload(base_url: str, share_id: str, envelope: bytes) -> str:
         sys.exit(f"POST /api/share -> {err.code} {detail}")
     except urllib.error.URLError as err:
         sys.exit(f"POST /api/share failed: {err.reason}\nis `wrangler dev` up at {base_url}?")
+    except (ValueError, UnicodeDecodeError) as err:
+        # A 2xx carrying something that is not JSON: the actionable message beats
+        # a raw traceback, since it means the route answered but not with the
+        # contract (a proxy or an error page in front of the Worker, typically).
+        sys.exit(f"POST /api/share returned a non-JSON body: {err}")
 
     token = body.get("deletionToken")
     if not token:

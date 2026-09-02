@@ -244,7 +244,7 @@
         </div>
       </div>
 
-      <div id="state-loading" class="state">
+      <div id="state-loading" class="state" role="status">
         <div class="message">
           <p>Opening share...</p>
         </div>
@@ -260,7 +260,9 @@
         </div>
         <footer>
           <span>SHARED FROM STASH</span>
-          <button type="button" id="report-share" hidden>REPORT THIS SHARE</button>
+          <!-- aria-live rather than role="status": a role would replace the button
+               semantics, where the attribute announces the swap and keeps them. -->
+          <button type="button" id="report-share" aria-live="polite" hidden>REPORT THIS SHARE</button>
         </footer>
       </div>
 
@@ -439,10 +441,19 @@
         if (attempt > 0) await delay(RETRY_DELAYS[attempt - 1]);
 
         try {
-          var response = await fetch('/api/share/' + id, {
-            cache: 'no-store',
-            signal: AbortSignal.timeout(ATTEMPT_TIMEOUT),
-          });
+          // AbortSignal.timeout landed later than the rest of this page's floor
+          // (Chromium 103 against DecompressionStream's 80), so it is probed and
+          // never assumed: a browser without it fetches unbounded, exactly as
+          // this page behaved before the timeout existed. Building the signal
+          // inline instead would throw a TypeError right here, inside the catch
+          // below - every attempt would fail instantly without sending a single
+          // request, and a perfectly good share would read as damaged.
+          var options = { cache: 'no-store' };
+          if (typeof AbortSignal !== 'undefined' && typeof AbortSignal.timeout === 'function') {
+            options.signal = AbortSignal.timeout(ATTEMPT_TIMEOUT);
+          }
+
+          var response = await fetch('/api/share/' + id, options);
           if (response.status === 200) {
             return { state: 'ok', bytes: new Uint8Array(await response.arrayBuffer()) };
           }
@@ -466,17 +477,20 @@
       var button = document.getElementById('report-share');
       button.hidden = false;
       button.addEventListener('click', function () {
+        // The text swaps BEFORE the POST goes out, and the POST is then forgotten.
+        // /api/report answers 202 to everything by design, so its response carries
+        // nothing the reader could act on - and waiting on a fetch that has no
+        // timeout means a socket which opens and never settles resolves neither
+        // branch, leaving this button disabled and un-swapped for good.
         button.disabled = true;
+        button.textContent = 'REPORTED - THANK YOU';
+
         fetch('/api/report', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ id: id }),
         }).catch(function () {
-          // /api/report answers 202 to everything by design, so the only failure
-          // reachable here is the network - nothing the reader can act on, and no
-          // second attempt worth asking them for. The text swaps either way.
-        }).then(function () {
-          button.textContent = 'REPORTED - THANK YOU';
+          // Swallowed so a failed report cannot surface as an unhandled rejection.
         });
       });
     }
