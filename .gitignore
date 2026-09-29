@@ -1,0 +1,9 @@
+# wrangler's local state: the simulated KV store `wrangler dev` writes to,
+# plus its caches. Never committed, never uploaded (see .assetsignore).
+.wrangler/
+
+# Agent task reports, review packages, anything else dot-task prefixed - working
+# notes, not site content. Deliberately extension-less: `wrangler deploy`
+# uploads the working DIRECTORY, not the git tree, so .assetsignore carries the
+# same glob and it is the one that actually keeps these off getstash.link.
+.task-*

@@ -1,4 +1,9 @@
 .git
+.gitignore
 .assetsignore
+.wrangler
+.task-*
 wrangler.jsonc
+worker.js
+scripts
 README.md
